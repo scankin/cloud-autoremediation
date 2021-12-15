@@ -1,5 +1,5 @@
 
-#Function CheckHigh-CPU {  
+Function Invoke-CPUCheck {  
     #Returns the number of processes running on the machine
     Function Get-NumProcesses {
         try {
@@ -21,19 +21,20 @@
             $Processes = Get-Process | 
                          Sort-Object CPU -desc |
                          Select -first 5 |
-                         Select ProcessName,ID,CPU,Description
+                         Select ProcessName,ID,CPU,StartTime
 
-            ForEach ($Process in $Processes){
-                $Output = [PSCustomObject]@{
-                    ID = $Process.Id
-                    ProcessName = $Process.ProcessName
-                    CPU = [math]::round($Process.CPU, 2)
-                    Description = $Process.Description
+                ForEach ($Process in $Processes){
+                    $Output = [PSCustomObject]@{
+                        ID = $Process.Id
+                        ProcessName = $Process.ProcessName
+                        CPU = [math]::round($Process.CPU, 2)
+                        StartTime = $Process.StartTime
+                    }
+
+                    $TopFiveProcesses += $Output
                 }
-
-                $TopFiveProcesses += $Output
-            }
-            return $TopFiveProcesses
+                return $TopFiveProcesses
+            
         }
         catch {
             $TopFiveProcesses = "Error Occured"
@@ -43,23 +44,41 @@
   #Get how long top processes have been running for
   Function Get-ProcessesUptime {
     try {
-        $Uptimes = @()
+        [Array]$Uptimes = @()
         $Processes = Get-Processes
-        if($Processes.length() -gt 0){
             ForEach($Process in $Processes){
+                #Get the Uptime Value for each Process
+                $Uptime = New-TimeSpan -Start (Get-Process -id $Process.Id).StartTime |
+                          Select-Object Days, Hours, Minutes, Seconds
+
                 $Output = [PSCustomObject]@{
                     ProcessName = $Process.ProcessName
-                    Uptime = New-TimeSpan -Start (get-process $Process.ProcessName).StartTime
+                    Days = $Uptime.Days
+                    Hours = $Uptime.Hours
+                    Minutes = $Uptime.Minutes
+                    Seconds = $Uptime.Seconds
                 }
+
+                $Uptimes += $Output
             }
-        }
+            return $Uptimes
     }catch{
-
+        $Output = [PSCustomObject]@{
+            ProcessName = "Error"
+            Days = "Error"
+            Hours = "Error"
+            Minutes = "Error"
+            Seconds = "Error"
+        }
+        
     }
+ }
 
-# }
-#}
-    echo "Num Processes: "
-    Get-NumProcesses
-    echo "Top 5 Processes: "
-    Get-Processes | Format-Table -AutoSize
+ echo "Num Processes: "
+ Get-NumProcesses
+ echo "Top 5 Processes: "
+ Get-Processes | Format-Table -AutoSize
+ echo "Process Uptimes: "
+ Get-ProcessesUptime | Format-Table -AutoSize
+
+}
