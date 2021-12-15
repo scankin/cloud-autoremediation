@@ -37,7 +37,12 @@ Function Invoke-CPUCheck {
             
         }
         catch {
-            $TopFiveProcesses = "Error Occured"
+            $Output = [PSCustomObject]@{
+                ID = "Error"
+                ProcessName = "Error"
+                CPU = "Error"
+                Description = "Error"
+            }
             return $TopFiveProcess
         }
     }
@@ -71,6 +76,7 @@ Function Invoke-CPUCheck {
             Seconds = "Error"
         }
         
+        return $Output
     }
  }
 
