@@ -21,14 +21,14 @@ Function Invoke-CPUCheck {
             $Processes = Get-Process | 
                          Sort-Object CPU -desc |
                          Select -first 5 |
-                         Select ProcessName,ID,CPU,StartTime
+                         Select ProcessName,ID,CPU,Description
 
                 ForEach ($Process in $Processes){
                     $Output = [PSCustomObject]@{
                         ID = $Process.Id
                         ProcessName = $Process.ProcessName
                         CPU = [math]::round($Process.CPU, 2)
-                        StartTime = $Process.StartTime
+                        Description = $Process.Description
                     }
 
                     $TopFiveProcesses += $Output
