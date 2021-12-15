@@ -1,5 +1,5 @@
 
-Function CheckHigh-CPU {  
+#Function CheckHigh-CPU {  
     #Returns the number of processes running on the machine
     Function Get-NumProcesses {
         try {
@@ -40,4 +40,26 @@ Function CheckHigh-CPU {
             return $TopFiveProcess
         }
     }
-}
+  #Get how long top processes have been running for
+  Function Get-ProcessesUptime {
+    try {
+        $Uptimes = @()
+        $Processes = Get-Processes
+        if($Processes.length() -gt 0){
+            ForEach($Process in $Processes){
+                $Output = [PSCustomObject]@{
+                    ProcessName = $Process.ProcessName
+                    Uptime = New-TimeSpan -Start (get-process $Process.ProcessName).StartTime
+                }
+            }
+        }
+    }catch{
+
+    }
+
+# }
+#}
+    echo "Num Processes: "
+    Get-NumProcesses
+    echo "Top 5 Processes: "
+    Get-Processes | Format-Table -AutoSize
