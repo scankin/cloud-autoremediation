@@ -16,7 +16,7 @@ Function Invoke-CPUCheck {
     Function Get-Processes {
         try {
 
-            [Array]$TopFiveProcesses = @()
+            $TopFiveProcesses = @()
 
             $Processes = Get-Process | 
                          Sort-Object CPU -desc |
@@ -49,7 +49,7 @@ Function Invoke-CPUCheck {
   #Get how long top processes have been running for
   Function Get-ProcessesUptime {
     try {
-        [Array]$Uptimes = @()
+        $Uptimes = @()
         $Processes = Get-Processes
             ForEach($Process in $Processes){
                 #Get the Uptime Value for each Process
@@ -78,13 +78,29 @@ Function Invoke-CPUCheck {
         
         return $Output
     }
+
+    Function Get-ComputerUptime {
+        try{
+            $ComputerUptime = (Get-Date) - (gcim Win32_OperatingSystem).LastBootUpTime |
+                              Select-Object Days, Hours, Minutes, Seconds |
+                              Format-Table -AutoSize
+
+            return $ComputerUptime
+        }catch{
+            $ComputerUptime = "Error has Occured"
+            return ComputerUptime
+        }
+    }
  }
+
 
  echo "Num Processes: "
  Get-NumProcesses
  echo "Top 5 Processes: "
  Get-Processes | Format-Table -AutoSize
- echo "Process Uptimes: "
+ echo "Top 5 Process Uptimes: "
  Get-ProcessesUptime | Format-Table -AutoSize
+ echo "Computer Uptime: "
+ Get-ComputerUptime
 
 }
