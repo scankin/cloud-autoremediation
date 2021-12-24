@@ -78,12 +78,13 @@ Function Invoke-CPUCheck {
         
         return $Output
     }
+    }
 
-    Function Get-ComputerUptime {
+    #Function to get the Uptime of the PC
+    Function Get-ComputeUptime {
         try{
             $ComputerUptime = (Get-Date) - (gcim Win32_OperatingSystem).LastBootUpTime |
-                              Select-Object Days, Hours, Minutes, Seconds |
-                              Format-Table -AutoSize
+                              Select-Object Days, Hours, Minutes, Seconds
 
             return $ComputerUptime
         }catch{
@@ -91,7 +92,7 @@ Function Invoke-CPUCheck {
             return ComputerUptime
         }
     }
- }
+ 
 
 
  echo "Num Processes: "
@@ -101,6 +102,5 @@ Function Invoke-CPUCheck {
  echo "Top 5 Process Uptimes: "
  Get-ProcessesUptime | Format-Table -AutoSize
  echo "Computer Uptime: "
- Get-ComputerUptime
-
+ Get-ComputeUptime | Format-Table -AutoSize
 }
