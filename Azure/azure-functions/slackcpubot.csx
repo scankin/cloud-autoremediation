@@ -1,4 +1,4 @@
-//This is purely to be run within an Azure Function
+//This is purely to be run within an Azure Function, ignore any errors 
 #r "Newtonsoft.Json"
 #r "System.Net.Http"
 
