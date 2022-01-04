@@ -1,3 +1,4 @@
+# Virtual network to host the scale set
 resource "azurerm_virtual_network" "vnet" {
   name                = join("-", [var.service, "vnet", local.name-suffix])
   location            = var.location
