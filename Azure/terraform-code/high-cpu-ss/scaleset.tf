@@ -1,9 +1,10 @@
 resource "azurerm_windows_virtual_machine_scale_set" "win-vm-ss" {
-  name                = join("-", [var.service, "ss", local.name-suffix])
+  name                = join("-", [var.service, var.environment])
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  sku                 = "Standard_F2"
   instances           = 1
+  upgrade_mode        = "Automatic"
+  sku                 = "Standard_F2"
   admin_password      = "passAdmin1!"
   admin_username      = "scottankin"
 
@@ -30,4 +31,64 @@ resource "azurerm_windows_virtual_machine_scale_set" "win-vm-ss" {
     }
   }
 
+  lifecycle {
+    ignore_changes = [instances]
+  }
+}
+
+resource "azurerm_monitor_autoscale_setting" "main" {
+  name                = "autoscale-configuration"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  target_resource_id  = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+
+  profile {
+    name = "AutoScale"
+
+    capacity {
+      default = 1
+      minimum = 1
+      maximum = 5
+    }
+
+    rule {
+      metric_trigger {
+        metric_name        = "Percentage CPU"
+        metric_resource_id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT15M"
+        time_aggregation   = "Average"
+        operator           = "GreaterThan"
+        threshold          = 80
+      }
+
+      scale_action {
+        direction = "Increase"
+        type      = "ChangeCount"
+        value     = 1
+        cooldown  = "PT10M"
+      }
+    }
+
+    rule {
+      metric_trigger {
+        metric_name        = "Percentage CPU"
+        metric_resource_id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT15M"
+        time_aggregation   = "Average"
+        operator           = "LessThan"
+        threshold          = 30
+      }
+
+      scale_action {
+        direction = "Decrease"
+        type      = "ChangeCount"
+        value     = 1
+        cooldown  = "PT10M"
+      }
+    }
+  }
 }
