@@ -46,7 +46,7 @@ variable "service" {
   validation {
     condition = (
       var.service == null ||
-      (coalesce(var.service, 0) >= 1 && coalesce(var.service, 9) <= 8)
+      (coalesce(length(var.service), 0) >= 1 && coalesce(length(var.service), 9) <= 8)
     )
 
     error_message = "The name of the service must be a length >= 1 and <= 8."
