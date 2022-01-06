@@ -23,3 +23,13 @@ resource "azurerm_automation_runbook" "highCPU" {
     uri = "https://raw.githubusercontent.com/scankin/cloud-autoremediation/main/Azure/powershell-scripts/highcpu.ps1?token=AVRCHJHXIBGAS2VRDCHH3ALB23DJS"
   }
 }
+
+##Creates the webhook
+resource "azurerm_automation_webhook" "webhook" {
+  name                    = "HighCPU-Webhook"
+  resource_group_name     = azurerm_resource_group.rg.name
+  automation_account_name = azurerm_automation_account.aa.name
+  expiry_time             = "2022-12-31T00:00:00Z"
+  enabled                 = true
+  runbook_name            = azurerm_automation_runbook.highCPU.name
+}
