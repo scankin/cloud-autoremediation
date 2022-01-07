@@ -1,6 +1,6 @@
 [OutputType("PSAzureOperationResponse")]
 param (
-    [Parameter(Mandatory="false")]
+    [Parameter(Mandatory=$false)]
     [object] $WebhookData
 )
 $ErrorActionPreference = "stop"
@@ -165,4 +165,4 @@ if($WebhookData){
 }
 
 
-Invoke-CPUCheck
+#Invoke-CPUCheck
