@@ -1,3 +1,9 @@
+[OutputType("PSAzureOperationResponse")]
+param (
+    [Parameter(Mandatory="false")]
+    [object] $WebhookData
+)
+$ErrorActionPreference = "stop"
 
 Function Invoke-CPUCheck {  
     #Returns the number of processes running on the machine
@@ -140,5 +146,23 @@ Function Invoke-CPUCheck {
 
     Create-Log
 }
+
+if($WebhookData){
+    $WebhookBody = (ConvertFrom-Json -InputObject $WebhookData.RequestBody)
+    $schemaID = $WebhookBody.schemaID
+
+    if($schemaID -eq "AzureMonitorMetricAlert"){
+        $AlertContext = [object] ($WebhookBody.data).context
+        $ResourceGroup = $AlertContext.resourceGroupName
+        $ResourceName = $AlertContext.resourceName
+
+        Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroup -VMName $ResourceName -CommandId "Invoke-CPUCheck"
+    }else{
+        Write-Output "The runbook has failed."
+    }
+}else{
+    Write-Output "No WebhookData was collected."
+}
+
 
 Invoke-CPUCheck
