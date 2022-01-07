@@ -20,7 +20,7 @@ resource "azurerm_automation_runbook" "highCPU" {
   runbook_type            = "PowerShell"
 
   publish_content_link {
-    uri = "https://raw.githubusercontent.com/scankin/cloud-autoremediation/main/Azure/powershell-scripts/highcpu.ps1?token=AVRCHJHXIBGAS2VRDCHH3ALB23DJS"
+    uri = "https://raw.githubusercontent.com/scankin/cloud-autoremediation/main/Azure/powershell-scripts/highcpu.ps1"
   }
 }
 

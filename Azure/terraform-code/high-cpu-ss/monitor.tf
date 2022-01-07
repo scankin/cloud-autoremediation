@@ -15,9 +15,9 @@ resource "azurerm_monitor_metric_alert" "alert" {
     threshold        = 80
   }
   
-  action {
-    action_group_id = azurerm_monitor_action_group.action-group.id
-  }
+  #action {
+  #  action_group_id = azurerm_monitor_action_group.action-group.id
+  #}
 }
 
 ##Action Group to run the Automation account
