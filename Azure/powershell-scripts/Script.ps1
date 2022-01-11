@@ -1,11 +1,4 @@
-[OutputType("PSAzureOperationResponse")]
-param (
-    [Parameter(Mandatory=$false)]
-    [object] $WebhookData
-)
-$ErrorActionPreference = "stop"
-
-$Script = 'Function Invoke-CPUCheck {  
+Function Invoke-CPUCheck {  
     #Returns the number of processes running on the machine
     Function Get-NumProcesses {
         try {
@@ -145,31 +138,11 @@ $Script = 'Function Invoke-CPUCheck {
     }
 
     #Create-Log
-    #Get-ComputeUptime
+    Get-ComputeUptime
     echo hello
 }
 
-Invoke-CPUCheck'
 
-Out-File -InputObject $Script -FilePath Script.ps1
 
-if($WebhookData){
-    $WebhookBody = (ConvertFrom-Json -InputObject $WebhookData.RequestBody)
-    $schemaID = $WebhookBody.$schemaID
 
-    if($schemaID = "AzureMonitorMetricAlert"){
-        $AlertContext = [object] ($WebhookBody.data).context 
-        $ResourceGroup = $AlertContext.resourceGroupName
-        $VMName = $AlertContext.resourceName
-
-        if(Test-Path -Path Script.ps1 -PathType Leaf){
-            Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroup -VMName $VMName -CommandId "RunPowerShellScript" -ScriptPath Script.ps1
-        }else{
-            Write-Output "Script File was not Found"
-        }
-    }else{
-        Write-Output "Script schema was not correct"
-    }
-}else{
-    Write-Output "There was no Webhook Data"
-}
+Invoke-CPUCheck
