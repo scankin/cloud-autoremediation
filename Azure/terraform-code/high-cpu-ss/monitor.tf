@@ -1,14 +1,14 @@
 resource "azurerm_monitor_metric_alert" "alert" {
   name                = join("-", ["highcpu", "vmss", "alert"])
   resource_group_name = azurerm_resource_group.rg.name
-  scopes              = [azurerm_virtual_machine.vm.id]
+  scopes              = [azurerm_windows_virtual_machine.vm.id]
 
   description = "This will be triggered when The CPU is Greater than 80% for 5 minutes."
   frequency   = "PT5M"
   severity    = 3
 
   criteria {
-    metric_namespace = "Microsoft.Compute/virtualMachineScaleSets"
+    metric_namespace = "Microsoft.Compute/virtualMachines"
     metric_name      = "Percentage CPU"
     aggregation      = "Average"
     operator         = "GreaterThan"

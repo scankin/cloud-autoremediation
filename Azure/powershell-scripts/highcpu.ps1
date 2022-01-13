@@ -116,54 +116,48 @@ $Script = 'Function Invoke-CPUCheck {
     }
 
     Function Create-Log{
-        $file = "c:\SysLogs\cpu-log.log"
-
-        #Checks to see if the log file exists
-        if(-not(Test-Path -Path $file -PathType Leaf)){
-            try {
-                New-Item -ItemType File -Path $file -Force -ErrorAction Stop
-                Create-Log
-            }
-            catch {
-                $errorMessage = "The file does not exist and has not been created."
-                Write-Output $errorMessage
-            }
-        } else {
-            $logRecord = "$(Get-Date -format "MM/dd/yyyy HH:mm:ss") "
-            $logRecord = $logRecord + "SystemInfo(Processes: $(Get-NumProcesses) LastBootTime: $(Get-LastBootup) ComputerUptime($(Get-ComputeUptime))) "
-            $logRecord = $logRecord + "ProcessInfo("
+        #Adds the date & System Info to Log
+        $logRecord = "$(Get-Date -format "MM/dd/yyyy HH:mm:ss") "
+        $logRecord = $logRecord + "SystemInfo(Processes: $(Get-NumProcesses) LastBootTime: $(Get-LastBootup) ComputerUptime($(Get-ComputeUptime))) "
+        $logRecord = $logRecord + "ProcessInfo("
         
-            $Counter = 0
-            $ProcessLog = Get-Processes
-            ForEach($Process in $ProcessLog){
-                $logRecord = $logRecord + "ProcessName[$($Counter)]: $($Process.ProcessName) CPUMetric[$($Counter)]: $($Process.CPU) "
-                $Counter += 1
-            }
-
-            Add-Content -Path $file -Value $logRecord -Encoding utf8
+        #Loops through each of the top 5 processes, adding the information to the log
+        $Counter = 0
+        $ProcessLog = Get-Processes
+        ForEach($Process in $ProcessLog){
+            $logRecord = $logRecord + "ProcessName[$($Counter)]: $($Process.ProcessName) CPUMetric[$($Counter)]: $($Process.CPU) "
+            $Counter += 1
         }
+
+        Write-Output $logRecord
+
     }
 
-    #Create-Log
-    #Get-ComputeUptime
-    echo hello
+    Create-Log
 }
 
 Invoke-CPUCheck'
+
+
+$ServicePrincipalConnection = Get-AutomationConnection -Name "AzureRunAsConnection"
+Add-AzAccount -ServicePrincipal -TenantId $ServicePrincipalConnection.TenantId -ApplicationId $ServicePrincipalConnection.ApplicationId -CertificateThumbprint $ServicePrincipalConnection.CertificateThumbprint | Out-Null
 
 Out-File -InputObject $Script -FilePath Script.ps1
 
 if($WebhookData){
     $WebhookBody = (ConvertFrom-Json -InputObject $WebhookData.RequestBody)
     $schemaID = $WebhookBody.$schemaID
+    echo "Webhook Data collected"
 
     if($schemaID = "AzureMonitorMetricAlert"){
         $AlertContext = [object] ($WebhookBody.data).context 
         $ResourceGroup = $AlertContext.resourceGroupName
         $VMName = $AlertContext.resourceName
-
+        echo "Got the schemaID"
         if(Test-Path -Path Script.ps1 -PathType Leaf){
-            Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroup -VMName $VMName -CommandId "RunPowerShellScript" -ScriptPath Script.ps1
+             $output = Invoke-AzVMRunCommand -ResourceGroupName $ResourceGroup -VMName $VMName -CommandId 'RunPowerShellScript' -ScriptPath Script.ps1
+             Write-Output $output.Value[0].Message
+            Write-Output "Script was Run?"
         }else{
             Write-Output "Script File was not Found"
         }
@@ -173,3 +167,5 @@ if($WebhookData){
 }else{
     Write-Output "There was no Webhook Data"
 }
+
+Disconnect-AzAccount -ApplicationID $ServicePrincipalConnection.ApplicationID -TenantID $ServicePrincipalConnection.TenantID | Out-Null
