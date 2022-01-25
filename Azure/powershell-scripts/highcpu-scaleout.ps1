@@ -145,30 +145,38 @@ $Script = 'Function Invoke-CPUCheck {
     }
 
     Function Create-JSON{
-
         $UptimeObject = Get-ComputeUptime | Select-Object Days, Hours, Minutes, Seconds
 
         $UpTime = [ordered]@{"Days" = "$($UptimeObject.Days)"; "Hours" = "$($UptimeObject.Hours)"; "Minutes" = "$($UptimeObject.Minutes)"; "Seconds" = "$($UptimeObject.Seconds)"}
         
-        $ProcessList = New-Object System.Collections.ArrayList
+        $ProcessList = @()
         $Processes = Get-Processes
-        $Counter = 0
+
         ForEach($Process in $Processes){
-            $ProcessItem = [ordered]@{"ID" = "$($Process.Id)";"Name" = "$($Process.ProcessName)"; "CPUMetric" = "$($Process.CPU)"}
+            $ProcessItem = [PSCustomObject]@{
+                ID = $Process.Id
+                Name = ($Process.ProcessName)
+                CPUMetric = $Process.CPU
+            }
             $ProcessList += $ProcessItem
-            $Counter += 1
         }
         
-        $SystemInfo = [ordered]@{"NumProcesses" = "$(Get-NumProcesses)"; "LastBootup" = "$(Get-LastBootup)"; "UpTime" = $UpTime}
-        $SystemInfo.Add("Processes", $ProcessList)
-        $output = [ordered]@{"VMName" = "$([System.Net.Dns]::GetHostName())"; "SystemInfo" = $SystemInfo}
+        $SystemInfo = [PSCustomObject]@{
+            NumProcesses = Get-NumProcesses 
+            LastBootup = Get-LastBootup
+            UpTime = $UpTime
+        }
 
+        $output = [ordered]@{
+            VMName = $([System.Net.Dns]::GetHostName())
+            SystemInfo = $SystemInfo
+            Processes = $ProcessList
+        }
 
-
-        Write-Output $output | ConvertTo-Json -Depth 100
+        Write-Output $output
     }
 
-    Create-JSON
+    Create-JSON | ConvertTo-JSON -Depth 10
 }
 
 Invoke-CPUCheck'
@@ -192,14 +200,18 @@ if($WebhookData){
         #Checks the Script file has been made
         if(Test-Path -Path Script.ps1 -PathType Leaf){
             #Writes the output of the file to the runbook
-            $ScaleSet = Get-AzVmss -ResourceGroupName $ResourceGroup -VMScaleSetName $VMName
+            $ScaleSet = Get-AzVmss -ResourceGroupName $ResourceGroup -VMScaleSetName $VMScaleSet
+			$output = [ordered]@{}
+			$InstanceList = @()
             foreach($instance in $ScaleSet){
                 $VM = Get-AzVMssVM -ResourceGroupName $instance.resourceGroupName -VMScaleSetName $instance.Name
                 $RunScript = Invoke-AzVmssVMRunCommand -ResourceGroupName $VM.resourceGroupName -VMScaleSetName $instance.Name -InstanceID $VM.InstanceID -CommandId 'RunPowerShellScript' -ScriptPath Script.ps1
-                $JSONOut = $RunScript.Value[0].Message
-                Write-Output $JSONOut
-                Invoke-WebRequest 'https://autoslackmessage.azurewebsites.net/api/HttpTrigger1?code=vIbsptXMuHdXt8UagIUoAaEL26RhUCnvhWqxC3RGQW4hsF6VmtD5Pg==' -SessionVariable 'Session' -Body $JSONOut -Method 'POST'
+                $ScriptOutput = $RunScript.Value[0].Message | ConvertFrom-Json
+				$InstanceList += $ScriptOutput
             }
+			$output.Add("VMs", $InstanceList)
+			$JSONOut = $Output | ConvertTo-JSON -Depth 10
+			Invoke-WebRequest 'https://autoslackmessage.azurewebsites.net/api/HttpTrigger1?code=vIbsptXMuHdXt8UagIUoAaEL26RhUCnvhWqxC3RGQW4hsF6VmtD5Pg==' -SessionVariable 'Session' -Body $JSONOut -Method 'POST'
         }else{
             Write-Output "Script File was not Found"
         }

@@ -19,42 +19,38 @@ public static async Task<IActionResult> Run(HttpRequest req, ILogger log){
     string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
     dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-    string vmName = data?.VMName;
-    string numProcesses = data?.SystemInfo?.NumProcesses;
-    string lastBootup = data?.SystemInfo?.LastBootup;
-    string uptimeDays = data?.SystemInfo?.UpTime?.Days;
-    string uptimeHours = data?.SystemInfo?.UpTime?.Hours;
-    string uptimeMinutes = data?.SystemInfo?.UpTime?.Minutes;
-    string uptimeSeconds = data?.SystemInfo?.UpTime?.Seconds;
-
     DateTime localTime = DateTime.Now;
     var uk = new CultureInfo("en-GB");
 
     string alertMessage = $"A System Scale-Out Occured on {localTime.ToString(uk)} \n";
-    string totalUptime = $"{uptimeDays} Day(s), {uptimeHours} Hour(s), {uptimeMinutes} Minute(s), {uptimeSeconds} Seconds";
-    alertMessage += $"VMName: {vmName} \n Number of Processes Running: {numProcesses} \n Last Boot Up Time: {lastBootup} \n Total Running Time: {totalUptime} \n";
-    alertMessage += "The Top 5 Processes are: \n";
 
-    DataTable dt = new DataTable();
-    dt.Clear();
-    dt.Columns.Add("ID");
-    dt.Columns.Add("Name");
-    dt.Columns.Add("CPU Metric");
-    foreach(var process in data?.SystemInfo?.Processes){
-        DataRow processData =dt.NewRow();
-        processData["ID"] = process.ID;
-        processData["Name"] = process.Name;
-        processData["CPU Metric"] = process.CPUMetric;
-        dt.Rows.Add(processData);
+    foreach(var VM in data.VMs){
+        string totalUptime = $"{VM.SystemInfo?.Uptime?.Days} Day(s), {VM.SystemInfo?.Uptime?.Hours} Hour(s), {VM.SystemInfo?.Uptime?.Minutes} Minute(s), {VM.SystemInfo?.Uptime?.Seconds} Seconds";
+        alertMessage += $"VMName: {VM.VMName} \n Number of Processes Running: {VM.SystemInfo?.NumProcesses} \n Last Boot Up Time: {VM.SystemInfo?.LastBootup} \n Total Running Time: {totalUptime} \n";
+        alertMessage += "The Top 5 Processes are: \n";
+
+        DataTable dt = new DataTable();
+        dt.Clear();
+        dt.Columns.Add("ID");
+        dt.Columns.Add("Name");
+        dt.Columns.Add("CPU Metric");
+
+        foreach(var process in VM.Processes){
+            DataRow processData =dt.NewRow();
+            processData["ID"] = process.ID;
+            processData["Name"] = process.Name;
+            processData["CPU Metric"] = process.CPUMetric;
+            dt.Rows.Add(processData);
+        }
+
+        alertMessage += convertDataTable(dt);
+        alertMessage += "\n";
     }
-
-    alertMessage += convertDataTable(dt);
-    alertMessage += "\n";
 
     string payload =  $"{{\"username\": \"AzureBot\", \"text\": \"{alertMessage}\"}}";
 
     //Creates a HttpRequestMessage which sends a post request to the webhook
-    HttpRequestMessage slackMessage = new HttpRequestMessage(HttpMethod.Post, "https://hooks.slack.com/services/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");
+    HttpRequestMessage slackMessage = new HttpRequestMessage(HttpMethod.Post, "https://hooks.slack.com/services/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");
     slackMessage.Content = new StringContent(payload, Encoding.UTF8, "application/json");
  
     //Sends Http Request
@@ -78,31 +74,16 @@ public static async Task<IActionResult> Run(HttpRequest req, ILogger log){
             }
         }
 
-        log.LogInformation("Gets past length!!!");
-
-
         // Get Column Titles
         for (int i = 0; i < dt.Columns.Count; i++){
             var length = dt.Columns[i].ColumnName.Length;
                if (columnsWidths[i] < length)
                    columnsWidths[i] = length;
         }
-        
-
-        // foreach (DataRow row in dt.Rows){
-        //    for(int i = 0; i < dt.Columns.Count; i++){
-        //        for(int i =)
-        //        var length = row[i].ToString().Length;
-        //        if (columnsWidths[i] < length)
-        //            columnsWidths[i] = length;
-        //    }     
-        // }
 
         // Write Column titles
         for (int i = 0; i < dt.Columns.Count; i++){
-            log.LogInformation("i = " + i.ToString());
             var text = dt.Columns[i].ColumnName;
-            log.LogInformation($"Text: {text}");
             output.Append("|" + PadCenter(text, columnsWidths[i] + 2));
         }
 
@@ -124,7 +105,7 @@ public static async Task<IActionResult> Run(HttpRequest req, ILogger log){
             return text;
         }else{
             int diff = maxLength - text.Length;
-            return new string(' ', (int) (diff / 2.0)) + text + new string(' ', (int) (diff / 2.0));
+            return new string(' ', (int) (diff)) + text + new string(' ', (int) (diff));
         }
     } 
 }
