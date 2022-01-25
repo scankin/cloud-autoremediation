@@ -10,7 +10,7 @@ resource "azurerm_automation_account" "aa" {
 
 ##Creates the runbook for creating logs
 resource "azurerm_automation_runbook" "highCPU" {
-  name                    = "HighCPU-Runbook"
+  name                    = join("-", ["HighCPU", "ScaleOut"])
   location                = azurerm_resource_group.rg.location
   resource_group_name     = azurerm_resource_group.rg.name
   automation_account_name = azurerm_automation_account.aa.name
