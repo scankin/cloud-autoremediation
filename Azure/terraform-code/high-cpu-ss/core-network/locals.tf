@@ -8,7 +8,7 @@ locals {
 
   tags = {
     terraform = "true",
-    time = timestamp()
+    time = formatdate("YYYY-MM-DD H:mm:ss", data.external.date.result["date"])
     environment = (var.environment == "dev" ? "1" : "5")
   }
 }

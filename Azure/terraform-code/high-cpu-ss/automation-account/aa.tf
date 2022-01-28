@@ -26,7 +26,7 @@ resource "azurerm_automation_runbook" "highCPU-scaleout" {
 
 ##Creates the webhook
 resource "azurerm_automation_webhook" "scaleout-webhook" {
-  name                    = "HighCPU-Webhook"
+  name                    = "HighCPU-ScaleOut"
   resource_group_name     = azurerm_resource_group.rg.name
   automation_account_name = azurerm_automation_account.aa.name
   expiry_time             = "2022-12-31T00:00:00Z"
@@ -51,7 +51,7 @@ resource "azurerm_automation_runbook" "highCPU-alert" {
 }
 
 resource "azurerm_automation_webhook" "alert-webhook" {
-  name                    = "HighCPU-Webhook"
+  name                    = "HighCPU-Alert"
   resource_group_name     = azurerm_resource_group.rg.name
   automation_account_name = azurerm_automation_account.aa.name
   expiry_time             = "2022-12-31T00:00:00Z"

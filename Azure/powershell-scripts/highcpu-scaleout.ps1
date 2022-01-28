@@ -176,6 +176,20 @@ $Script = 'Function Invoke-CPUCheck {
         Write-Output $output
     }
 
+    Function Console-Output {
+        $UptimeObject = Get-ComputeUptime | Select-Object Days, Hours, Minutes, Seconds
+        $SystemInfo = " VM Name: $([System.Net.Dns]::GetHostName()) `n Number of Processes Running: $(Get-NumProcesses) `n Last Bootup: $(Get-LastBootup) `n"
+        $SystemInfo += " Total Computer Uptime: $($UptimeObject.Days) Day(s) $($UptimeObject.Hours) Hour(s) $($UptimeObject.Minutes) Minute(s) $($UptimeObject.Seconds) Second(s)"
+        
+        Write-Output "=========================System Info==================================="
+        Write-Output $SystemInfo
+        Write-Output "========================Top 5 Processes================================"
+        Get-Processes | Format-Table
+        Write-Output "=====================Processes Total Uptime============================"
+        Get-ProcessesUptime | Format-Table
+        Write-Output "======================================================================="
+    }
+
     Create-JSON | ConvertTo-JSON -Depth 10
 }
 

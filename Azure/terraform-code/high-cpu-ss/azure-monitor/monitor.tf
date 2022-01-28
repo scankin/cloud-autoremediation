@@ -4,8 +4,8 @@ resource "azurerm_monitor_metric_alert" "scaleout-alert" {
   scopes              = [var.scale-set-id]
 
   description = "This will be triggered when The CPU is Greater than 80% for 5 minutes."
-  frequency   = "PT15M"
-  window_size = "PT5M"
+  frequency   = "PT5M"
+  window_size = "PT15M"
   severity    = 2
 
   criteria {
@@ -27,8 +27,8 @@ resource "azurerm_monitor_metric_alert" "highcpu-alert" {
   scopes              = [var.scale-set-id]
 
   description = "This will be triggered when The CPU is Greater than 80% for 5 minutes."
-  frequency   = "PT5M"
-  window_size = "PT1M"
+  frequency   = "PT1M"
+  window_size = "PT5M"
   severity    = 3
 
   criteria {

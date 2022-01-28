@@ -13,7 +13,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "win-vm-ss" {
  source_image_reference {
    publisher = "MicrosoftWindowsServer"
    offer     = "WindowsServer"
-   sku       = "2016-Datacenter-Server-Core"
+   sku       = "2019-Datacenter"
    version   = "latest"
  }
 
@@ -39,7 +39,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "win-vm-ss" {
  }
 
  lifecycle {
-   ignore_changes = [instances]
+   ignore_changes = [instances, tags]
  }
 
  tags = local.tags
