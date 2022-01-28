@@ -59,7 +59,7 @@ $Script = 'Function Invoke-CPUCheck {
 
             $uptimeString = $SystemUptime.LastBootUpTime
 
-            return $uptimeString
+            return $uptimeString.ToString()
         }
         catch {
             $SystemUptime = "Error"
