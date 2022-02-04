@@ -1,5 +1,5 @@
 resource "azurerm_monitor_metric_alert" "scaleout-alert" {
-  name                = join("-", ["highcpu", "vmss", "alert"])
+  name                = join("-", ["highcpu", "vmss", "scale", "out"])
   resource_group_name = join("-", [var.service, "rg", var.location, var.environment])
   scopes              = [var.scale-set-id]
 
