@@ -52,7 +52,7 @@ Function Invoke-CPUCheck {
 
             $uptimeString = $SystemUptime.LastBootUpTime
 
-            return $uptimeString
+            return $uptimeString.ToString()
         }
         catch {
             $SystemUptime = "Error"
@@ -119,7 +119,7 @@ Function Invoke-CPUCheck {
         }
     }
 
-    Function Create-Log{
+    Function Get-Log{
         #Adds the date & System Info to Log
         $logRecord = "$(Get-Date -format "MM/dd/yyyy HH:mm:ss") "
         $logRecord = $logRecord + "SystemInfo(Processes: $(Get-NumProcesses), LastBootTime: $(Get-LastBootup), ComputerUptime($(Get-ComputeUptime))) "
@@ -137,7 +137,7 @@ Function Invoke-CPUCheck {
 
     }
 
-    Function Create-JSON{
+    Function Get-JSON{
 
         $UptimeObject = Get-ComputeUptime | Select-Object Days, Hours, Minutes, Seconds
 
@@ -170,20 +170,20 @@ Function Invoke-CPUCheck {
         Write-Output $output
     }
 
-    Function Console-Output {
+    Function Get-Output {
         $UptimeObject = Get-ComputeUptime | Select-Object Days, Hours, Minutes, Seconds
-
-        Write-Output "VM Name: $([System.Net.Dns]::GetHostName())"
-        Write-Output "Number of Processes Running: $(Get-NumProcesses)"
-        Write-Output "Last Bootup: $(Get-LastBootup)"
-        Write-Output "Total Computer Uptime: $($UptimeObject.Days) Day(s) $($UptimeObject.Hours) Hour(s) $($UptimeObject.Minutes) Minute(s) $($UptimeObject.Seconds) Second(s)"
-        Write-Output "Top 5 Processes: "
+        $SystemInfo = " VM Name: $([System.Net.Dns]::GetHostName()) `n Number of Processes Running: $(Get-NumProcesses) `n Last Bootup: $(Get-LastBootup) `n"
+        $SystemInfo += " Total Computer Uptime: $($UptimeObject.Days) Day(s) $($UptimeObject.Hours) Hour(s) $($UptimeObject.Minutes) Minute(s) $($UptimeObject.Seconds) Second(s)"
+        Write-Output "=========================System Info==================================="
+        Write-Output $SystemInfo
+        Write-Output "========================Top 5 Processes================================"
         Get-Processes | Format-Table
-        Write-Output "Processes Total Uptime: "
+        Write-Output "=====================Processes Total Uptime============================"
         Get-ProcessesUptime | Format-Table
+        Write-Output "======================================================================="
     }
 
-    Console-Output
+    Get-LastBootup
 }
 
 Invoke-CPUCheck
