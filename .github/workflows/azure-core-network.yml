@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    if: ${{ github.event.labeled.name == 'deploy' }}
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
     name: 'Core Network Deployment'
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
