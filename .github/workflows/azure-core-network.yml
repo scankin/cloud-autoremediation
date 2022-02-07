@@ -1,9 +1,6 @@
 name: 'Core Network Deployment'
 
-on:
-  workflow_dispatch:
-    branches:
-      - development
+on: workflow_dispatch
 
 jobs:
   build:
