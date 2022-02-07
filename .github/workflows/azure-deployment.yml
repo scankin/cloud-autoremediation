@@ -1,7 +1,7 @@
 name: 'Deploying Azure Infrastructure'
 
 on:
-  workflow_dispatched:
+  workflow_dispatch:
 
 jobs:
   terraform:
