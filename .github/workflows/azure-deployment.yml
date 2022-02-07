@@ -2,8 +2,6 @@ name: 'Deploying Azure Infrastructure'
 
 on:
   push:
-    branches:
-    - development
     pull_request:
 
 jobs:
