@@ -38,7 +38,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: "Deploy Core Network"
-      uses: ./.github/actions/azure-deployment
+      uses: ./.github/actions/azure-deployment@development
       with:
         workflowPath: $INPUT_workflowPath
         environment: $INPUT_environment
