@@ -1,0 +1,27 @@
+name: 'Core Network Deployment'
+
+on:
+  pull_request:
+    types: [ labeled ]
+
+jobs:
+  build:
+    if: ${{ github.event.labeled.name == 'deploy' }}
+    name: 'Core Network Deployment'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+      PATH: "./Azure/terraform-code/high-cpu-ss/core-network"
+      ENV: "dev"
+      SERVICE: "hub"
+      LOCATION: "uksouth"
+    runs-ons: ubuntu-latest
+
+    steps:
+    - name: "Checkout"
+    - uses: actions/checkout@v2
+
+    call-worklflow-1:
+      uses: .\azure-deployment.yml
