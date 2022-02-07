@@ -1,6 +1,7 @@
 name: 'Core Network Deployment'
 
-on: workflow_dispatch
+on:
+  workflow_dispatch
 
 jobs:
   build:
@@ -14,12 +15,12 @@ jobs:
       ENV: "dev"
       SERVICE: "hub"
       LOCATION: "uksouth"
-    runs-ons: ubuntu-latest
+    runs-on: ubuntu-latest
+    
 
     steps:
     - name: "Checkout"
       uses: actions/checkout@v2
 
-    step:
     - name: "Deploy Core Network"
-      uses: .\azure-deployment.yml
+      uses: .\azure-deployment.yml@1
