@@ -1,0 +1,52 @@
+name: "Deploy Core Network"
+description: "Deploys core networking infrastructure to Azure"
+author: "scott.ankin@devopsgroup.com (Scott Ankin)"
+
+inputs:
+  environment:
+    description: The environment which the resources are being deployed.
+    required: true
+    default: 'dev'
+
+  location:
+    description: The region where the resources will be deployed.
+    required: true
+    default: 'uksouth'
+
+  service:
+    description: The service which the resources will be deployed to.
+    required: true
+    default: 'auto'
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+    runs-on: ubuntu-latest
+    environment: $environment
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: 'Terraform Init'
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: 0.14.8
+        tf_actions_subcommand: 'init'
+        tf_actions_working_dir: "./"
+    
+    - name: 'Terraform Validate'
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: 0.14.8
+        tf_actions_subcommand: 'init'
+        tf_actions_working_dir: "./"
