@@ -2,11 +2,9 @@ name: 'Core Network Deployment'
 
 on:
   pull_request:
-    types: [ labeled ]
 
 jobs:
   build:
-    if: contains(github.event.pull_request.labels.*.name, 'deploy')
     name: 'Core Network Deployment'
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
