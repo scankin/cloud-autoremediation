@@ -2,6 +2,19 @@ name: 'Deploying Azure Infrastructure'
 
 on:
   workflow_dispatch:
+    inputs:
+      workflowPath:
+        description: 'The path of the main deployment workflow.'
+        required: true
+      environment:
+        description: 'The environment the resources will be deployed to.'
+        required: true
+      service:
+        description: 'The service the resources will be deployed to.'
+        required: true
+      location:
+        description: 'The location here the resources will be deployed'
+        required: true
 
 jobs:
   terraform:
@@ -21,11 +34,11 @@ jobs:
       with:
         tf_actions_version: 0.14.8
         tf_actions_subcommand: 'init'
-        tf_actions_working_dir: $PATH
+        tf_actions_working_dir: $INPUT_workflowPath
 
     - name: 'Terraform Validate'
       uses: hashicorp/terraform-github-actions@master
       with:
         tf_actions_version: 0.14.8
         tf_actions_subcommand: 'validate'
-        tf_actions_working_dir: $PATH
+        tf_actions_working_dir: $INPUT_workflowPath
