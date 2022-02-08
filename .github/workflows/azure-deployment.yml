@@ -6,15 +6,19 @@ on:
       workflowPath:
         description: 'The path of the main deployment workflow.'
         required: true
+        type: string
       environment:
         description: 'The environment the resources will be deployed to.'
         required: true
+        type: string
       service:
         description: 'The service the resources will be deployed to.'
         required: true
+        type: string
       location:
         description: 'The location here the resources will be deployed'
         required: true
+        type: string
 
 jobs:
   terraform:
