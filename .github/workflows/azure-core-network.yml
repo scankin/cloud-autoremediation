@@ -44,7 +44,7 @@ jobs:
     name: 'Deploy Core network'
     uses: ./.github/workflows/azure-deployment.yml
     with:
-      workflowPath: $INPUT_workflowPath
-      environment: $INPUT_environment
-      service: $INPUT_service
-      location: $INPUT_location
+      workflowPath: $INPUT_WORKFLOWPATH
+      environment: $INPUT_WORKFLOWPATH
+      service: $INPUT_WORKFLOWPATH
+      location: $INPUT_WORKFLOWPATH
