@@ -1,7 +1,7 @@
 name: 'Deploying Azure Infrastructure'
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       workflowPath:
         description: 'The path of the main deployment workflow.'
