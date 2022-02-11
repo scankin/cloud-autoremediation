@@ -116,7 +116,7 @@ resource azurerm_virtual_machine_scale_set_extension "dsc" {
     {
       "WmfVersion": "latest",
       "configuration": {
-        "url": "https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1",
+        "url": "https://github.com/scankin/cloud-autoremediation/blob/development/Azure/powershell-scripts/DSC.zip?raw=true",
         "script": "install-gremlin.ps1",
         "function": "install-gremlin"
       }
