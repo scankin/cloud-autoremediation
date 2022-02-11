@@ -45,6 +45,8 @@ resource "azurerm_windows_virtual_machine_scale_set" "win-vm-ss" {
   tags = local.tags
 }
 
+################################ Scale Out Arguments ################################
+
 resource "azurerm_monitor_autoscale_setting" "main" {
   name                = "autoscale-configuration"
   resource_group_name = azurerm_resource_group.rg.name
@@ -100,4 +102,25 @@ resource "azurerm_monitor_autoscale_setting" "main" {
       }
     }
   }
+}
+
+################################ Extensions ################################
+
+resource azurerm_virtual_machine_scale_set_extension "dsc" {
+  name = "dsc-extension"
+  virtual_machine_scale_set_id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+  publisher = "Microsoft.Powershell"
+  type                         = "DSC"
+  type_handler_version         = "2.20"
+  settings = <<SETTINGS
+    "WmfVersion": "latest",
+    "configuration": {
+      "url": "https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1"
+      "script": "install-gremlin.ps1"
+      "function":
+    }
+
+
+
+  SETTINGS
 }
