@@ -113,14 +113,13 @@ resource azurerm_virtual_machine_scale_set_extension "dsc" {
   type                         = "DSC"
   type_handler_version         = "2.20"
   settings = <<SETTINGS
-    "WmfVersion": "latest",
-    "configuration": {
-      "url": "https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1"
-      "script": "install-gremlin.ps1"
-      "function":
+    {
+      "WmfVersion": "latest",
+      "configuration": {
+        "url": "https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1",
+        "script": "install-gremlin.ps1",
+        "function": "install-gremlin"
+      }
     }
-
-
-
   SETTINGS
 }
