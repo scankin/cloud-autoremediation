@@ -46,7 +46,7 @@ resource "azurerm_monitor_metric_alert" "highcpu-alert" {
 
 ##Action Group to run the Automation account
 resource "azurerm_monitor_action_group" "scaleout-action-group" {
-  name                = join("-", ["highcpu", "alert"])
+  name                = join("-", ["highcpu", "scaleout"])
   resource_group_name = azurerm_resource_group.rg.name
   short_name          = "ScaleOut-AG"
 
@@ -66,7 +66,7 @@ resource "azurerm_monitor_action_group" "high-cpu-alert-action-group" {
  short_name          = "Alert-AG"
 
  automation_runbook_receiver {
-   name                  = join("-", ["action", "runbook"])
+   name                  = join("-", ["highcpu", "alert"])
    automation_account_id = azurerm_automation_account.aa.id
    runbook_name          = azurerm_automation_runbook.highCPU-alert.name
    is_global_runbook     = true
