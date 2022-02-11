@@ -66,9 +66,9 @@ resource "azurerm_monitor_autoscale_setting" "main" {
       metric_trigger {
         metric_name        = "Percentage CPU"
         metric_resource_id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
-        time_grain         = "PT1M"
+        time_grain         = "PT5M"
         statistic          = "Average"
-        time_window        = "PT5M"
+        time_window        = "PT15M"
         time_aggregation   = "Average"
         operator           = "GreaterThan"
         threshold          = 80
@@ -111,16 +111,15 @@ resource "azurerm_virtual_machine_scale_set_extension" "cse" {
   virtual_machine_scale_set_id   = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
   publisher                      = "Microsoft.Compute"
   type                           = "CustomScriptExtension"
-  type_handler_version           = "2.0"
+  type_handler_version           = "1.10"
 
   settings = jsonencode({
-    "commandToExecute" = <<COMMAND
-      $fileContents = "identifier: $(hostname) `nteam_id: 42812f71-0159-4588-812f-710159258899`nteam_secret: f2e948ad-da5d-48cf-a948-adda5da8cf98"
-      msiexec /package https://windows.gremlin.com/installer/latest/gremlin_installer.msi /qn
-      Start-Sleep -s 20
-      $fileContents | Out-File -FilePath C:\ProgramData\Gremlin\Agent\config.yml
-      net stop gremlind
-      net start gremlind
-    COMMAND
+    "timestamp": ""
+  })
+
+  protected_settings = jsonencode({
+    "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File install-gremlin.ps1",
+    "fileUris": ["https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1"],
+    "managedIdentity" : {}
   })
 }

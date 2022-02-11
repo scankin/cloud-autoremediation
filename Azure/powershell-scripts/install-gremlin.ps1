@@ -3,7 +3,7 @@ $fileContents = "identifier: $(hostname) `nteam_id: 42812f71-0159-4588-812f-7101
 
 msiexec /package https://windows.gremlin.com/installer/latest/gremlin_installer.msi /qn
 Start-Sleep -s 20
-$fileContents | Out-File -FilePath C:\ProgramData\Gremlin\Agent\config.yml
+$fileContents | Out-File -FilePath C:\ProgramData\Gremlin\Agent\config.yaml
 
 net stop gremlind
 net start gremlind

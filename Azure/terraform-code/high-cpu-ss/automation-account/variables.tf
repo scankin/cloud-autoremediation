@@ -70,3 +70,13 @@ variable "tags" {
     terraform = "true"
   }
 }
+
+variable "scale-set-id" {
+  type = string
+
+  description = <<DESC
+  The ID of the scale set.
+  DESC
+
+  default = null
+}
