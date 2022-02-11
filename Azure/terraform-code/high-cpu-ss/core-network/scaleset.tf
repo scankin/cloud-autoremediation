@@ -106,20 +106,21 @@ resource "azurerm_monitor_autoscale_setting" "main" {
 
 ################################ Extensions ################################
 
-resource azurerm_virtual_machine_scale_set_extension "dsc" {
-  name = "dsc-extension"
-  virtual_machine_scale_set_id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
-  publisher = "Microsoft.Powershell"
-  type                         = "DSC"
-  type_handler_version         = "2.20"
-  settings = <<SETTINGS
-    {
-      "WmfVersion": "latest",
-      "configuration": {
-        "url": "https://github.com/scankin/cloud-autoremediation/blob/development/Azure/powershell-scripts/DSC.zip?raw=true",
-        "script": "install-gremlin.ps1",
-        "function": "install-gremlin"
-      }
-    }
-  SETTINGS
+resource "azurerm_virtual_machine_scale_set_extension" "cse" {
+  name                           = "custom-script-extension"
+  virtual_machine_scale_set_id   = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+  publisher                      = "Microsoft.Compute"
+  type                           = "CustomScriptExtension"
+  type_handler_version           = "2.0"
+
+  settings = jsonencode({
+    "commandToExecute" = <<COMMAND
+      $fileContents = "identifier: $(hostname) `nteam_id: 42812f71-0159-4588-812f-710159258899`nteam_secret: f2e948ad-da5d-48cf-a948-adda5da8cf98"
+      msiexec /package https://windows.gremlin.com/installer/latest/gremlin_installer.msi /qn
+      Start-Sleep -s 20
+      $fileContents | Out-File -FilePath C:\ProgramData\Gremlin\Agent\config.yml
+      net stop gremlind
+      net start gremlind
+    COMMAND
+  })
 }
