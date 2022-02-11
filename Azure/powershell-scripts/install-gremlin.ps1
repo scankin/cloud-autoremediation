@@ -1,9 +1,13 @@
+#Installing the Gremlin Client onto Windows VM Script
 
-$fileContents = "identifier: $(hostname)`nteam_id: 42812f71-0159-4588-812f-710159258899`nteam_secret: f2e948ad-da5d-48cf-a948-adda5da8cf98"
-
+#Install the package
 msiexec /quiet /package https://windows.gremlin.com/installer/latest/gremlin_installer.msi
-Start-Sleep -s 20
-$fileContents | Out-File -FilePath C:\ProgramData\Gremlin\Agent\config.yaml
 
+#Set the environment variables
+[Environment]::SetEnvironmentVariable("GREMLIN_IDENTIFIER", "$(hostname)", "Machine")
+[Environment]::SetEnvironmentVariable("GREMLIN_TEAM_ID", "42812f71-0159-4588-812f-710159258899", "Machine")
+[Environment]::SetEnvironmentVariable("GREMLIN_TEAM_SECRET", "f2e948ad-da5d-48cf-a948-adda5da8cf98", "Machine")
+
+#Restart the service
 net stop gremlind
 net start gremlind
