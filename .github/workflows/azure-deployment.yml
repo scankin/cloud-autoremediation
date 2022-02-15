@@ -33,18 +33,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-  variable-check:
-    name: 'Variable Check'
-    steps:
-    - name: 'Check location'
-      run: echo 'The location is {{ github.events.inputs.location }}'
-    - name: 'Check environment'
-      run: echo 'The environment is {{ github.events.inputs.environment }}'
-    - name: 'Check service'
-      run: echo 'The service is {{ github.events.inputs.service }}'    
-    - name: 'Check service'
-      run: echo 'The workflowPath is {{ github.events.inputs.workflowPath }}'   
-
   terraform-init:
     name: 'Terraform Init'
     uses: hashicorp/terraform-github-actions@master
