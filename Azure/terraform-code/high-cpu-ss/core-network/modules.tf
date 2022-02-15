@@ -5,8 +5,23 @@ module "aa" {
   location    = var.location
   service     = var.service
 
+<<<<<<< HEAD
   scale-set-id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
 
+=======
+  tags = var.tags
+}
+
+module "monitor" {
+  source = "../azure-monitor"
+
+  environment = var.environment
+  location    = var.location
+  service     = var.service
+
+  scale-set-id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+
+>>>>>>> main
   tags = var.tags
 }
 

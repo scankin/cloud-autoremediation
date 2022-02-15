@@ -66,9 +66,15 @@ resource "azurerm_monitor_autoscale_setting" "main" {
       metric_trigger {
         metric_name        = "Percentage CPU"
         metric_resource_id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+<<<<<<< HEAD
         time_grain         = "PT5M"
         statistic          = "Average"
         time_window        = "PT15M"
+=======
+        time_grain         = "PT1M"
+        statistic          = "Average"
+        time_window        = "PT5M"
+>>>>>>> main
         time_aggregation   = "Average"
         operator           = "GreaterThan"
         threshold          = 80
@@ -102,6 +108,7 @@ resource "azurerm_monitor_autoscale_setting" "main" {
       }
     }
   }
+<<<<<<< HEAD
 }
 
 ################################ Extensions ################################
@@ -122,4 +129,6 @@ resource "azurerm_virtual_machine_scale_set_extension" "cse" {
     "fileUris": ["https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1"],
     "managedIdentity" : {}
   })
+=======
+>>>>>>> main
 }
