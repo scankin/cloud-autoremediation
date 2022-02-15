@@ -36,9 +36,9 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
     runs-on: ubuntu-latest
     
-  checkout:
-    name: 'Checkout'
-    uses: actions/checkout@v2
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
 
   deploy-core-network:
     uses: scankin/cloud-autoremediation/.github/workflows/azure-deployment.yml@main
