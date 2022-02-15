@@ -42,7 +42,7 @@ jobs:
 
   deploy-core-network:
     name: 'Deploy Core network'
-    uses: ./.github/workflows/azure-deployment.yml
+    uses: ./.github/workflows/azure-deployment.yml@development
     with:
       workflowPath: ${{ github.event.inputs.workflowPath }}
       environment: ${{ github.event.inputs.environment }}
