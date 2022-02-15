@@ -34,7 +34,7 @@ variable "location" {
   }
 
   description = <<DESC
-  The reigion where the resources will be deployed, either UK South or UK West.
+  The region where the resources will be deployed, either UK South or UK West.
   DESC
 
   default = null

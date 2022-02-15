@@ -45,6 +45,8 @@ resource "azurerm_windows_virtual_machine_scale_set" "win-vm-ss" {
   tags = local.tags
 }
 
+################################ Scale Out Arguments ################################
+
 resource "azurerm_monitor_autoscale_setting" "main" {
   name                = "autoscale-configuration"
   resource_group_name = azurerm_resource_group.rg.name
@@ -64,9 +66,9 @@ resource "azurerm_monitor_autoscale_setting" "main" {
       metric_trigger {
         metric_name        = "Percentage CPU"
         metric_resource_id = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
-        time_grain         = "PT1M"
+        time_grain         = "PT5M"
         statistic          = "Average"
-        time_window        = "PT5M"
+        time_window        = "PT15M"
         time_aggregation   = "Average"
         operator           = "GreaterThan"
         threshold          = 80
@@ -100,4 +102,25 @@ resource "azurerm_monitor_autoscale_setting" "main" {
       }
     }
   }
+
+}
+
+################################ Extensions ################################
+
+resource "azurerm_virtual_machine_scale_set_extension" "cse" {
+  name                           = "custom-script-extension"
+  virtual_machine_scale_set_id   = azurerm_windows_virtual_machine_scale_set.win-vm-ss.id
+  publisher                      = "Microsoft.Compute"
+  type                           = "CustomScriptExtension"
+  type_handler_version           = "1.10"
+
+  settings = jsonencode({
+    "timestamp": ""
+  })
+
+  protected_settings = jsonencode({
+    "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File install-gremlin.ps1",
+    "fileUris": ["https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1"],
+    "managedIdentity" : {}
+  })
 }
