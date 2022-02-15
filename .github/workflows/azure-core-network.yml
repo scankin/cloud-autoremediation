@@ -41,7 +41,6 @@ jobs:
     uses: actions/checkout@v2
 
   deploy-core-network:
-    name: 'Deploy Core network'
     uses: '.github/workflows/azure-deployment.yml'
     with:
       workflowPath: ${{ github.event.inputs.workflowPath }}
