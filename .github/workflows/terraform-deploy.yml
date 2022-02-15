@@ -46,3 +46,12 @@ jobs:
         tf_actions_version: 0.14.8
         tf_actions_subcommand: 'validate'
         tf_actions_working_dir: '${{github.event.inputs.workflowPath}}'
+
+    - name: 'Terraform Plan'
+      uses: hashicorp/terraform-github-actions@master
+      with:
+        tf_actions_version: 0.14.8
+        tf_actions_subcommand: 'plan'
+        tf_actions_working_dir: '${{github.event.inputs.workflowPath}}'
+        args: '-var-file="envs/dev.tfvars"'
+      
