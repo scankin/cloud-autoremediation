@@ -24,7 +24,7 @@ on:
         description: 'The location here the resources will be deployed'
         required: true
         type: string
-        default: 'uksouth'
+        default: 'uksout'
 
 jobs:
   build:
