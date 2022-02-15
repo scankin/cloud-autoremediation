@@ -24,7 +24,7 @@ on:
         description: 'The location here the resources will be deployed'
         required: true
         type: string
-        default: 'uksout'
+        default: 'uksouth'
 
 jobs:
   build:
@@ -41,7 +41,7 @@ jobs:
     uses: actions/checkout@v2
 
   deploy-core-network:
-    uses: ./.github/workflows/azure-deployment.yml
+    uses: cloud-autoremediation/.github/workflows/azure-deployment.yml
     with:
       workflowPath: ${{ github.event.inputs.workflowPath }}
       environment: ${{ github.event.inputs.environment }}
