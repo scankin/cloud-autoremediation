@@ -1,9 +1,9 @@
-name: 'Core Network Deployment'
+
+
+name: Core Net Deployment Manual
 
 on:
-  push:
-    branches:
-    - development
+  workflow_dispatch:
     inputs:
       workflowPath:
         description: 'The path of the main deployment workflow.'
@@ -36,23 +36,14 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
     runs-on: ubuntu-latest
     
-<<<<<<< HEAD
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
   deploy-core-network:
-    uses: scankin/cloud-autoremediation/.github/workflows/azure-deployment.yml@main
-=======
-  checkout:
-    name: 'Checkout'
-    uses: actions/checkout@v2
-
-  deploy-core-network:
     uses: ./.github/workflows/azure-deployment.yml
->>>>>>> main
     with:
-      workflowPath: ${{ github.event.inputs.workflowPath }}
-      environment: ${{ github.event.inputs.environment }}
-      service: ${{ github.event.inputs.service }}
-      location: ${{ github.event.inputs.location }}
+      workflowPath: ${{github.event.inputs.workflowPath}}
+      environment: ${{github.event.inputs.environment}}
+      service: ${{github.event.inputs.service}}
+      location: ${{github.event.inputs.location}}
