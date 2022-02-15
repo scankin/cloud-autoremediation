@@ -42,9 +42,9 @@ jobs:
 
   deploy-core-network:
     name: 'Deploy Core network'
-    uses: scankin/cloud-autoremediation/.github/workflows/azure-deployment.yml
+    uses: ./.github/workflows/azure-deployment.yml
     with:
-      workflowPath: ${{ github.events.inputs.workflowPath }}
-      environment: ${{ github.events.inputs.environment }}
-      service: ${{ github.events.inputs.service }}
-      location: ${{ github.events.inputs.location }}
+      workflowPath: ${{ github.event.inputs.workflowPath }}
+      environment: ${{ github.event.inputs.environment }}
+      service: ${{ github.event.inputs.service }}
+      location: ${{ github.event.inputs.location }}
