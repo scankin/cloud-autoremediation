@@ -34,8 +34,6 @@ jobs:
     with:
       workflowPath: ${{github.event.inputs.workflowPath}}
       environment: ${{github.event.inputs.environment}}
-      service: ${{github.event.inputs.service}}
-      location: ${{github.event.inputs.location}}
     secrets:
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
