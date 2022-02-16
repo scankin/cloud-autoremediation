@@ -38,13 +38,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       
-    - name: Azure-CLI-Logon
+    - name: 'AZ Login'
       uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
       
   deploy-core-network:
-    if: steps.Azure-CLI-Logon.conclusion == 'success'
+    needs: build 
     uses: ./.github/workflows/terraform-deploy.yml
     with:
       workflowPath: ${{github.event.inputs.workflowPath}}
