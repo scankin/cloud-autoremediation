@@ -44,6 +44,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
       
   terraform:
+    needs: build
     name: 'Deploy-CoreNetwork'
     runs-on: ubuntu-latest
     environment: ${{github.event.inputs.environment}}
