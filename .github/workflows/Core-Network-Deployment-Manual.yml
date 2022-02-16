@@ -40,6 +40,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
+    - name: "Login via Azure CLI"
+      uses: azure/login@v1
+      with:
+        creds: ${{env.AZURE_CREDENTIALS}}
+
   deploy-core-network:
     uses: ./.github/workflows/terraform-deploy.yml
     with:
