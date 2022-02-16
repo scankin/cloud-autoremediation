@@ -63,6 +63,7 @@ jobs:
       
   Apply:
     name: 'Apply'
+    needs: Plan
     runs-on: ubuntu-latest
     environment: ${{github.event.inputs.environment}}
     
