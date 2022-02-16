@@ -13,16 +13,6 @@ on:
         required: true
         type: string
         default: 'dev'
-      service:
-        description: 'The service the resources will be deployed to.'
-        required: true
-        type: string
-        default: 'hub'
-      location:
-        description: 'The location here the resources will be deployed'
-        required: true
-        type: string
-        default: 'uksouth'
 
 jobs:
   build:
@@ -46,3 +36,8 @@ jobs:
       environment: ${{github.event.inputs.environment}}
       service: ${{github.event.inputs.service}}
       location: ${{github.event.inputs.location}}
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ ARM_SUBSCRIPTION_ID }}
