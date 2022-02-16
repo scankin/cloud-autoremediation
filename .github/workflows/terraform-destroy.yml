@@ -1,0 +1,43 @@
+name: 'Deploying Azure Infrastructure'
+
+on:
+  workflow_call:
+    inputs:
+      workflowPath:
+        description: 'The path of the main deployment workflow.'
+        required: true
+        type: string
+      environment:
+        description: 'The environment the resources will be deployed to.'
+        required: true
+        type: string
+    secrets:
+      ARM_CLIENT_ID:
+        required: true
+      ARM_CLIENT_SECRET:
+        required: true
+      ARM_TENANT_ID:
+        required: true
+      ARM_SUBSCRIPTION_ID:
+        required: true
+      
+
+jobs:
+  Destroy:
+    name: 'Destroy'
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{github.event.inputs.workflowPath}}
+        
+    steps:
+    - name: 'Terraform Apply'
+      id: apply
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      run: terraform destroy -var-file="./envs/dev.tfvars" -auto-approve
