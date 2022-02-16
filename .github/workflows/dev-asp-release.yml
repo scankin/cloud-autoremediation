@@ -1,0 +1,41 @@
+name: App Service Plan Deployment Manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflowPath:
+        description: 'The path of the main deployment workflow.'
+        required: true
+        type: string
+        default: "./Azure/terraform-code/high-cpu-ss/app-service-plan"
+      environment:
+        description: 'The environment the resources will be deployed to.'
+        required: true
+        type: string
+        default: 'dev'
+
+jobs:
+  build:
+    name: 'Core Network Deployment'
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_AD_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_AD_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_AD_TENANT_ID }}
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      
+  deploy-core-network:
+    needs: build 
+    uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      workflowPath: ${{github.event.inputs.workflowPath}}
+      environment: ${{github.event.inputs.environment}}
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
