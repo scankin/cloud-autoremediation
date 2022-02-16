@@ -13,6 +13,10 @@ on:
         required: true
         type: string
         default: 'dev'
+      action:
+        description: 'Whether to apply or destroy the core network'
+        required: true
+        default: 'apply'
 
 jobs:
   build:
@@ -29,8 +33,22 @@ jobs:
       uses: actions/checkout@v2
       
   deploy-core-network:
+    if: contains(github.event.inputs.action, "apply")
     needs: build 
     uses: ./.github/workflows/terraform-deploy.yml
+    with:
+      workflowPath: ${{github.event.inputs.workflowPath}}
+      environment: ${{github.event.inputs.environment}}
+    secrets:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+  destroy-core-network:
+    if: contains(github.event.inputs.action, "destroy")
+    needs: build 
+    uses: ./.github/workflows/terraform-destroy.yml
     with:
       workflowPath: ${{github.event.inputs.workflowPath}}
       environment: ${{github.event.inputs.environment}}
