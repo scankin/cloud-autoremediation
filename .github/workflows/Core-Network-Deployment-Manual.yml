@@ -38,11 +38,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       
-    - name: 'AZ Login'
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-      
   terraform:
     needs: build
     name: 'Deploy-CoreNetwork'
@@ -63,6 +58,11 @@ jobs:
 
     - name: 'Terraform Init'
       id: init
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID 
       run: terraform init
 
     - name: 'Terraform Validate'
@@ -71,8 +71,9 @@ jobs:
 
     - name: 'Terraform Plan'
       id: plan
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID
       run: terraform plan -var-file="dev.tfvars"
-
-    - name: Azure logout
-      run: |
-        az logout
