@@ -43,11 +43,35 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
       
-  deploy-core-network:
-    needs: build 
-    uses: ./.github/workflows/terraform-deploy.yml
-    with:
-      workflowPath: ${{github.event.inputs.workflowPath}}
-      environment: ${{github.event.inputs.environment}}
-      service: ${{github.event.inputs.service}}
-      location: ${{github.event.inputs.location}}
+  terraform:
+    name: 'Deploy-CoreNetwork'
+    runs-on: ubuntu-latest
+    environment: ${{github.event.inputs.environment}}
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{github.event.inputs.workflowPath}}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup-Terraform
+      uses: hashicorp/setup-terraform@v1
+
+    - name: 'Terraform Init'
+      id: init
+      run: terraform init
+
+    - name: 'Terraform Validate'
+      id: validate
+      run: terraform validate
+
+    - name: 'Terraform Plan'
+      id: plan
+      run: terraform plan -var-file="dev.tfvars"
+
+    - name: Azure logout
+      run: |
+        az logout
