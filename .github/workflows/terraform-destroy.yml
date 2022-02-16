@@ -1,4 +1,4 @@
-name: 'Deploying Azure Infrastructure'
+name: 'Destroy Azure Infrastructure'
 
 on:
   workflow_call:
