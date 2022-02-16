@@ -10,13 +10,3 @@ module "aa" {
 
   tags = var.tags
 }
-
-module "asp" {
-  source = "../app-service-plan"
-
-  environment = var.environment
-  location    = var.location
-  service     = var.service
-
-  tags = var.tags
-}
