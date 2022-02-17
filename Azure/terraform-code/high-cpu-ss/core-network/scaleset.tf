@@ -120,7 +120,7 @@ resource "azurerm_virtual_machine_scale_set_extension" "cse" {
 
   protected_settings = jsonencode({
     "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File install-gremlin.ps1",
-    "fileUris": ["https://raw.githubusercontent.com/scankin/cloud-autoremediation/development/Azure/powershell-scripts/install-gremlin.ps1"],
+    "fileUris": ["https://raw.githubusercontent.com/scankin/cloud-autoremediation/main/Azure/powershell-scripts/install-gremlin.ps1"],
     "managedIdentity" : {}
   })
 }
