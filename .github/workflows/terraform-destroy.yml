@@ -1,4 +1,4 @@
-name: 'Deploying Azure Infrastructure'
+name: 'Destroy Azure Infrastructure'
 
 on:
   workflow_call:
@@ -38,7 +38,7 @@ jobs:
         
     - name: Setup-Terraform
       uses: hashicorp/setup-terraform@v1
-
+      
     - name: 'Terraform Init'
       id: init
       env:
