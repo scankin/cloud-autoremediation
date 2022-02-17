@@ -1,7 +1,7 @@
 #Installing the Gremlin Client onto Windows VM Script
 
 #Install the package
-msiexec /quiet /package https://windows.gremlin.com/installer/latest/gremlin_installer.msi
+msiexec /package https://windows.gremlin.com/installer/latest/gremlin_installer.msi /qn
 
 #Set the environment variables
 [Environment]::SetEnvironmentVariable("GREMLIN_IDENTIFIER", "$(hostname)", "Machine")
