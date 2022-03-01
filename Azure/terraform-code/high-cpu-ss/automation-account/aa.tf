@@ -1,3 +1,7 @@
+#######################################################################################
+################################# High CPU Automation #################################
+#######################################################################################
+
 resource "azurerm_automation_account" "aa" {
   name                = join("", [var.service, "aa", local.name-suffix])
   location            = var.location
@@ -23,6 +27,7 @@ resource "azurerm_automation_runbook" "highCPU-scaleout" {
     uri = "https://raw.githubusercontent.com/scankin/cloud-autoremediation/main/Azure/powershell-scripts/highcpu-scaleout.ps1"
   }
 }
+
 
 ##Creates the webhook
 resource "azurerm_automation_webhook" "scaleout-webhook" {
@@ -57,4 +62,23 @@ resource "azurerm_automation_webhook" "alert-webhook" {
   expiry_time             = "2022-12-31T00:00:00Z"
   enabled                 = true
   runbook_name            = azurerm_automation_runbook.highCPU-alert.name
+}
+
+#######################################################################################
+############################### Restart Service Automation ############################
+#######################################################################################
+
+resource "azurerm_automation_runbook" "restart-service" {
+  name = "Restart Service"
+  location = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  automation_account_name = azurerm_automation_account.aa.name
+  log_verbose             = "true"
+  log_progress            = "true"
+  description             = "This runs on a schedule to check if a service has stopped, if it has it restarts the service."
+  runbook_type            = "Powershell"
+
+  publish_content_link {
+    uri = "https://raw.githubusercontent.com/scankin/cloud-autoremediation/main/Azure/powershell-scripts/azure-restart-vm-service.ps1"
+  }
 }

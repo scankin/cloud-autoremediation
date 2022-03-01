@@ -16,9 +16,9 @@ resource "azurerm_monitor_metric_alert" "scaleout-alert" {
     threshold        = 80
   }
 
-  action {
-    action_group_id = azurerm_monitor_action_group.scaleout-action-group.id
-  }
+  # action {
+  #   action_group_id = azurerm_monitor_action_group.scaleout-action-group.id
+  # }
 }
 
 resource "azurerm_monitor_metric_alert" "highcpu-alert" {
@@ -39,38 +39,38 @@ resource "azurerm_monitor_metric_alert" "highcpu-alert" {
     threshold        = 80
   }
 
-  action {
-    action_group_id = azurerm_monitor_action_group.high-cpu-alert-action-group.id
-  }
+  # action {
+  #   action_group_id = azurerm_monitor_action_group.high-cpu-alert-action-group.id
+  # }
 }
 
 ##Action Group to run the Automation account
-resource "azurerm_monitor_action_group" "scaleout-action-group" {
-  name                = join("-", ["highcpu", "scaleout"])
-  resource_group_name = azurerm_resource_group.rg.name
-  short_name          = "ScaleOut-AG"
+# resource "azurerm_monitor_action_group" "scaleout-action-group" {
+#   name                = join("-", ["highcpu", "scaleout"])
+#   resource_group_name = azurerm_resource_group.rg.name
+#   short_name          = "ScaleOut-AG"
 
-  automation_runbook_receiver {
-    name                  = join("-", ["highcpu", "scaleout"])
-    automation_account_id = azurerm_automation_account.aa.id
-    runbook_name          = azurerm_automation_runbook.highCPU-scaleout.name
-    is_global_runbook     = true
-    webhook_resource_id   = azurerm_automation_webhook.scaleout-webhook.id
-    service_uri           = "http://runbook"
-  }
-}
+#   automation_runbook_receiver {
+#     name                  = join("-", ["highcpu", "scaleout"])
+#     automation_account_id = azurerm_automation_account.aa.id
+#     runbook_name          = azurerm_automation_runbook.highCPU-scaleout.name
+#     is_global_runbook     = true
+#     webhook_resource_id   = azurerm_automation_webhook.scaleout-webhook.id
+#     service_uri           = "https://runbook"
+#   }
+# }
 
-resource "azurerm_monitor_action_group" "high-cpu-alert-action-group" {
- name                = join("-", ["highcpu", "alert"])
- resource_group_name = azurerm_resource_group.rg.name
- short_name          = "Alert-AG"
+# resource "azurerm_monitor_action_group" "high-cpu-alert-action-group" {
+#  name                = join("-", ["highcpu", "alert"])
+#  resource_group_name = azurerm_resource_group.rg.name
+#  short_name          = "Alert-AG"
 
- automation_runbook_receiver {
-   name                  = join("-", ["highcpu", "alert"])
-   automation_account_id = azurerm_automation_account.aa.id
-   runbook_name          = azurerm_automation_runbook.highCPU-alert.name
-   is_global_runbook     = true
-   webhook_resource_id   = azurerm_automation_webhook.alert-webhook.id
-   service_uri           = "http://runbook"
- }
-}
+#  automation_runbook_receiver {
+#    name                  = join("-", ["highcpu", "alert"])
+#    automation_account_id = azurerm_automation_account.aa.id
+#    runbook_name          = azurerm_automation_runbook.highCPU-alert.name
+#    is_global_runbook     = true
+#    webhook_resource_id   = azurerm_automation_webhook.alert-webhook.id
+#    service_uri           = "https://runbook"
+#  }
+# }
