@@ -215,12 +215,24 @@ if($WebhookData){
         #Checks the Script file has been made
         if(Test-Path -Path Script.ps1 -PathType Leaf){
             #Writes the output of the file to the runbook
+            $OutputMessage = "A Scaleout Ocurred on $(Get-Date) `n"
             $ScaleSet = Get-AzVmss -ResourceGroupName $ResourceGroup -VMScaleSetName $VMScaleSet
             foreach($instance in $ScaleSet){
                 $VM = Get-AzVMssVM -ResourceGroupName $instance.resourceGroupName -VMScaleSetName $instance.Name
                 $RunScript = Invoke-AzVmssVMRunCommand -ResourceGroupName $VM.resourceGroupName -VMScaleSetName $instance.Name -InstanceID $VM.InstanceID -CommandId 'RunPowerShellScript' -ScriptPath Script.ps1
+                $OutputMessage += "$($RunScript.Value[0].Message) `n" 
+                
                 Write-Output $RunScript.Value[0].Message
             }
+
+            $payload = [PSCustomObject]@{
+                username = "AzureBot"
+                text = $OutputMessage
+            }
+
+            $payloadJSON =  ConvertTo-Json $payload
+
+            Invoke-WebRequest 'https://hooks.slack.com/services/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' -SessionVariable 'Session' -Body $payloadJSON -Method 'POST'
         }else{
             Write-Output "Script File was not Found"
         }
