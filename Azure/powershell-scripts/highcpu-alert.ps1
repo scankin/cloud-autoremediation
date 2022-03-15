@@ -48,8 +48,37 @@ $Script = 'Function Invoke-CPUCheck {
                 CPU = "Error"
                 Description = "Error"
             }
-            return $TopFiveProcess
+            return $Output
         }
+    }
+
+    Function Get-ProcessPercentage {
+        try {
+            $Top5Processes = @()
+
+            $Processes = Get-WmiObject Win32_PerfFormattedData_PerfProc_Process | 
+                         where-object{ $_.Name -ne "_Total" -and $_.Name -ne "Idle"} | 
+                         Sort-Object PercentProcessorTime -Descending | 
+                         Select-object Name, IDProcess, PercentProcessorTime -First 5
+
+            ForEach ($Process in $Processes){
+                $Output = [PSCustomObject]@{
+                    ID = $Process.IDProcess
+                    ProcessName = $Process.Name
+                    CPU = $Process.PercentProcessorTime
+                }
+                $TopFiveProcesses += $Output
+            }
+            return $TopFiveProcesses
+        } catch {
+			$Output = [PSCustomObject]@{
+                ID = "Error"
+                ProcessName = "Error"
+                CPU = "Error"
+            }
+
+			return $Output
+		}
     }
 
     Function Get-LastBootup {
@@ -126,69 +155,19 @@ $Script = 'Function Invoke-CPUCheck {
         }
     }
 
-    Function Create-Log{
-        #Adds the date & System Info to Log
-        $logRecord = "$(Get-Date -format "MM/dd/yyyy HH:mm:ss") "
-        $logRecord = $logRecord + "SystemInfo(Processes: $(Get-NumProcesses), LastBootTime: $(Get-LastBootup), ComputerUptime($(Get-ComputeUptime))) "
-        $logRecord = $logRecord + "ProcessInfo("
-        
-        #Loops through each of the top 5 processes, adding the information to the log
-        $Counter = 0
-        $ProcessLog = Get-Processes
-        ForEach($Process in $ProcessLog){
-            $logRecord = $logRecord + "ProcessName[$($Counter)]: $($Process.ProcessName) CPUMetric[$($Counter)]: $($Process.CPU) "
-            $Counter += 1
-        }
-
-        Write-Output $logRecord
-
-    }
-
-    Function Create-JSON{
-
-        $UptimeObject = Get-ComputeUptime | Select-Object Days, Hours, Minutes, Seconds
-
-        $UpTime = [ordered]@{"Days" = "$($UptimeObject.Days)"; "Hours" = "$($UptimeObject.Hours)"; "Minutes" = "$($UptimeObject.Minutes)"; "Seconds" = "$($UptimeObject.Seconds)"}
-        
-        $ProcessList = @()
-        $Processes = Get-Processes
-
-        ForEach($Process in $Processes){
-            $ProcessItem = [PSCustomObject]@{
-                ID = $Process.Id
-                Name = ($Process.ProcessName)
-                CPUMetric = $Process.CPU
-            }
-            $ProcessList += $ProcessItem
-        }
-        
-        $SystemInfo = [PSCustomObject]@{
-            NumProcesses = Get-NumProcesses 
-            LastBootup = Get-LastBootup
-            UpTime = $UpTime
-        }
-
-        $output = [ordered]@{
-            VMName = $([System.Net.Dns]::GetHostName())
-            SystemInfo = $SystemInfo
-            Processes = $ProcessList
-        }
-
-        Write-Output $output
-    }
-
     Function Console-Output {
         $UptimeObject = Get-ComputeUptime | Select-Object Days, Hours, Minutes, Seconds
         $SystemInfo = " VM Name: $([System.Net.Dns]::GetHostName()) `n Number of Processes Running: $(Get-NumProcesses) `n Last Bootup: $(Get-LastBootup) `n"
         $SystemInfo += " Total Computer Uptime: $($UptimeObject.Days) Day(s) $($UptimeObject.Hours) Hour(s) $($UptimeObject.Minutes) Minute(s) $($UptimeObject.Seconds) Second(s)"
         
-        Write-Output "=========================System Info==================================="
+        Write-Output "=========================System Info===================================="
         Write-Output $SystemInfo
-        Write-Output "========================Top 5 Processes================================"
+        Write-Output "=========================Top 5 Processes================================"
         Get-Processes | Format-Table
-        Write-Output "=====================Processes Total Uptime============================"
+        Write-Output "======================Processes Total Uptime============================"
         Get-ProcessesUptime | Format-Table
         Write-Output "======================================================================="
+        Get-ProcessPercentage | Format-Table
     }
 
     Console-Output
@@ -215,24 +194,12 @@ if($WebhookData){
         #Checks the Script file has been made
         if(Test-Path -Path Script.ps1 -PathType Leaf){
             #Writes the output of the file to the runbook
-            $OutputMessage = "A Scaleout Ocurred on $(Get-Date) `n"
             $ScaleSet = Get-AzVmss -ResourceGroupName $ResourceGroup -VMScaleSetName $VMScaleSet
             foreach($instance in $ScaleSet){
                 $VM = Get-AzVMssVM -ResourceGroupName $instance.resourceGroupName -VMScaleSetName $instance.Name
                 $RunScript = Invoke-AzVmssVMRunCommand -ResourceGroupName $VM.resourceGroupName -VMScaleSetName $instance.Name -InstanceID $VM.InstanceID -CommandId 'RunPowerShellScript' -ScriptPath Script.ps1
-                $OutputMessage += "$($RunScript.Value[0].Message) `n" 
-                
                 Write-Output $RunScript.Value[0].Message
             }
-
-            $payload = [PSCustomObject]@{
-                username = "AzureBot"
-                text = $OutputMessage
-            }
-
-            $payloadJSON =  ConvertTo-Json $payload
-
-            Invoke-WebRequest 'https://hooks.slack.com/services/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' -SessionVariable 'Session' -Body $payloadJSON -Method 'POST'
         }else{
             Write-Output "Script File was not Found"
         }
