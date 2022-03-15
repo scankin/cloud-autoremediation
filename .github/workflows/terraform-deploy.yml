@@ -60,9 +60,9 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       run: |
-        if ${{ github.event.inputs.workflowPath }} == 'dev'; then
+        if [${{ github.event.inputs.workflowPath }} == 'dev']; then
           terraform plan -var-file="./envs/dev.tfvars"
-        elif ${{ github.event.inputs.workflowPath }} == 'sta'; then
+        elif [${{ github.event.inputs.workflowPath }} == 'sta']; then
           terraform plan -var-file="./envs/sta.tfvars"
         fi
       
@@ -101,8 +101,8 @@ jobs:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       run:  |
-        if ${{ github.event.inputs.workflowPath }} == 'dev'; then
-          terraform plan -var-file="./envs/dev.tfvars"
-        elif ${{ github.event.inputs.workflowPath }} == 'sta'; then
-          terraform plan -var-file="./envs/sta.tfvars"
+        if [${{ github.event.inputs.workflowPath }} == 'dev']; then
+          terraform apply -var-file="./envs/dev.tfvars" -auto-approve
+        elif [${{ github.event.inputs.workflowPath }} == 'sta']; then
+          terraform apply -var-file="./envs/sta.tfvars" -auto-approve
         fi
